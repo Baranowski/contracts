@@ -87,7 +87,10 @@ runZ3smt t file = do
     let file' = dropExtension file ++ ".smt"
     exists <- doesFileExist file'
     if exists
-        then timed t "z3" Nothing ["-smt2","-nw",file',"-t:"++show t]
+        then do
+            let regexp = "s/min/hccmin/g"
+            system $ "sed " ++ regexp ++ " " ++ show file' ++ " > " ++ show file' ++ ".z3"
+            timed t "z3" Nothing ["-smt2","-nw",file' ++ ".z3","-t:"++show t]
         else do
             putStrLn $ file' ++ " does not exist!"
             return Nothing
